@@ -468,19 +468,21 @@ exports.ZeroScansInfo = {
     version: '2.0.1',
     name: 'Zero Scans',
     icon: 'icon.png',
-    author: 'NmN',
-    authorWebsite: 'http://github.com/pandeynmm',
-    description: 'Extension that pulls manga from bato.to',
+    author: 'Gabe',
+    authorWebsite: 'http://github.com/GabrielCWT',
+    description: 'Extension that pulls manga from zscans.com',
     contentRating: types_1.ContentRating.EVERYONE,
     websiteBaseURL: ZEROSCANS_DOMAIN,
     language: 'en',
     sourceTags: [
         {
             text: 'English',
-            type: types_1.BadgeColor.GREY
-        }
+            type: types_1.BadgeColor.GREY,
+        },
     ],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+    intents: types_1.SourceIntents.MANGA_CHAPTERS |
+        types_1.SourceIntents.HOMEPAGE_SECTIONS |
+        types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
 };
 const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1';
 class ZeroScans {
@@ -496,15 +498,15 @@ class ZeroScans {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': userAgent,
-                            'referer': `${this.baseUrl}/`
-                        }
+                            referer: `${this.baseUrl}/`,
+                        },
                     };
                     return request;
                 },
                 interceptResponse: async (response) => {
                     return response;
-                }
-            }
+                },
+            },
         });
         this.RETRY = 5;
         this.parser = new parser_1.Parser();
@@ -555,9 +557,9 @@ class ZeroScans {
             url,
             method: 'GET',
         });
-        const response = await this.requestManager.schedule(request, this.RETRY) ?? '';
+        const response = (await this.requestManager.schedule(request, this.RETRY)) ?? '';
         if (!response || !response.data) {
-            return JSON.parse('{error: \'true\'}');
+            return JSON.parse("{error: 'true'}");
         }
         const json = JSON.parse(response.data);
         return json;
@@ -574,7 +576,10 @@ class ZeroScans {
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
         if (page == -1)
-            return App.createPagedResults({ results: [], metadata: { page: -1 } });
+            return App.createPagedResults({
+                results: [],
+                metadata: { page: -1 },
+            });
         const request = App.createRequest({
             url: `${this.baseUrl}/swordflake/comics`,
             method: 'GET',
@@ -599,13 +604,18 @@ class ZeroScans {
         for (const item of json.data.genres) {
             genres.push(App.createTag({ label: item.name, id: item.slug }));
         }
-        const tagSections = [App.createTagSection({ id: '0', label: 'Genres', tags: genres })];
+        const tagSections = [
+            App.createTagSection({ id: '0', label: 'Genres', tags: genres }),
+        ];
         return tagSections;
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
         if (page == -1)
-            return App.createPagedResults({ results: [], metadata: { page: -1 } });
+            return App.createPagedResults({
+                results: [],
+                metadata: { page: -1 },
+            });
         const request = App.createRequest({
             url: `${this.baseUrl}/swordflake/comics`,
             method: 'GET',
@@ -646,28 +656,28 @@ class ZeroScans {
             time = new Date(Date.now());
         }
         else if (date.includes('YEAR') || date.includes('YEARS')) {
-            time = new Date(Date.now() - (number * 31556952000));
+            time = new Date(Date.now() - number * 31556952000);
         }
         else if (date.includes('MONTH') || date.includes('MONTHS')) {
-            time = new Date(Date.now() - (number * 2592000000));
+            time = new Date(Date.now() - number * 2592000000);
         }
         else if (date.includes('WEEK') || date.includes('WEEKS')) {
-            time = new Date(Date.now() - (number * 604800000));
+            time = new Date(Date.now() - number * 604800000);
         }
         else if (date.includes('YESTERDAY')) {
             time = new Date(Date.now() - 86400000);
         }
         else if (date.includes('DAY') || date.includes('DAYS')) {
-            time = new Date(Date.now() - (number * 86400000));
+            time = new Date(Date.now() - number * 86400000);
         }
         else if (date.includes('HOUR') || date.includes('HOURS')) {
-            time = new Date(Date.now() - (number * 3600000));
+            time = new Date(Date.now() - number * 3600000);
         }
         else if (date.includes('MINUTE') || date.includes('MINUTES')) {
-            time = new Date(Date.now() - (number * 60000));
+            time = new Date(Date.now() - number * 60000);
         }
         else if (date.includes('SECOND') || date.includes('SECONDS')) {
-            time = new Date(Date.now() - (number * 1000));
+            time = new Date(Date.now() - number * 1000);
         }
         else {
             time = new Date(date);
@@ -680,8 +690,8 @@ class ZeroScans {
             method: 'GET',
             headers: {
                 'user-agent': userAgent,
-                'referer': `${this.baseUrl}/`
-            }
+                referer: `${this.baseUrl}/`,
+            },
         });
     }
     CloudFlareError(status) {
