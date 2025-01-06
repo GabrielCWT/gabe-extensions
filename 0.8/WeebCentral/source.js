@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1727,17 +1727,12 @@ class Parser {
             }),
         });
     }
-    /*
-        Chapters are given 0 and then uses the sorting index. This is because
-        some mangas have S1 Ch6 i.e. Tower of God. This is to ensure that the
-        chapters are sorted correctly.
-
-        Note: If there are missing chapters then the chapter numbering will be wrong.
-        Would be nice to find a better solution.
-    */
     parseChapters($, mangaId) {
+        const floatRegex = /(\d+\.\d+|\d+)/g;
         const chapters = [];
         const arrChapters = $('a.flex.items-center').toArray();
+        const types = {};
+        let currTypeId = 0;
         let sortingIndex = 0;
         for (const chapterObj of arrChapters) {
             const chapterId = $(chapterObj)
@@ -1752,11 +1747,23 @@ class Parser {
                 .first()
                 .text()
                 .trim();
+            let chapNum = 0;
+            let chapType = '';
+            const matches = chapName.match(floatRegex);
+            if (matches && matches[matches.length - 1]) {
+                chapNum = parseFloat(matches[matches.length - 1] ?? '0');
+                chapType = chapName
+                    .slice(0, -matches[matches.length - 1].length)
+                    .trim();
+            }
             sortingIndex--;
+            if (!(chapType in types)) {
+                types[chapType] = currTypeId--;
+            }
             chapters.push(App.createChapter({
                 id: chapterId,
                 name: chapName,
-                chapNum: 0,
+                chapNum,
                 time,
                 sortingIndex,
                 langCode: 'en',
@@ -1765,9 +1772,17 @@ class Parser {
         if (chapters.length == 0) {
             throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}`);
         }
+        const totalTypes = Object.keys(types).length;
         return chapters.map((chapter) => {
+            chapter.volume = 0;
+            const matches = chapter.name.match(floatRegex);
+            if (matches) {
+                let chapType = chapter.name
+                    .slice(0, -matches[matches.length - 1].length)
+                    .trim();
+                chapter.volume = totalTypes + types[chapType];
+            }
             chapter.sortingIndex += chapters.length;
-            chapter.chapNum = chapter.sortingIndex;
             return App.createChapter(chapter);
         });
     }
