@@ -1534,12 +1534,19 @@ class WeebCentral {
         const LIMIT = 32;
         const offset = metadata?.offset ?? 0;
         let searchParams = '';
-        searchParams = searchParams.concat(`&text=${query.title ?? ''}`);
-        for (const tag of query.includedTags) {
-            searchParams = searchParams.concat(`&included_tag=${tag.id}`);
+        // Regular search
+        if (query.title) {
+            searchParams = searchParams.concat(encodeURI(`&text=${query.title ?? ''}`));
+        }
+        // Tag search
+        else {
+            for (const tag of query.includedTags) {
+                searchParams = searchParams.concat(`&included_tag=${tag.id}`);
+            }
+            searchParams.concat(`limit=${LIMIT}&offset=${offset}`);
         }
         const request = App.createRequest({
-            url: `${this.baseUrl}/search/data?limit=${LIMIT}&offset=${offset}&sort=Best%20Match&order=Ascending&display_mode=Full%20Display${searchParams}`,
+            url: `${this.baseUrl}/search/data?sort=Best%20Match&order=Ascending&display_mode=Full%20Display${searchParams}`,
             method: 'GET',
         });
         const response = await this.requestManager.schedule(request, this.RETRY);
@@ -1693,7 +1700,7 @@ class Parser {
         const genres = [];
         for (const genreObj of $('a', $('strong:contains("Tags(s)")').siblings()).toArray()) {
             const genre = $(genreObj).text().trim();
-            const id = genre;
+            const id = encodeURI(genre);
             genres.push(App.createTag({ id, label: genre }));
         }
         const tagSections = [
