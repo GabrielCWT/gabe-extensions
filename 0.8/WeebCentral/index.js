@@ -1445,7 +1445,7 @@ exports.WeebCentralInfo = {
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
     authorWebsite: 'http://github.com/GabrielCWT',
-    icon: 'icon.ico',
+    icon: 'icon.png',
     contentRating: types_1.ContentRating.EVERYONE,
     websiteBaseURL: BASE_DOMAIN,
     sourceTags: [
