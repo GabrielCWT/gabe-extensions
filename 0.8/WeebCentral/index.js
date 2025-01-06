@@ -1727,9 +1727,18 @@ class Parser {
             }),
         });
     }
+    /*
+        Chapters are given 0 and then uses the sorting index. This is because
+        some mangas have S1 Ch6 i.e. Tower of God. This is to ensure that the
+        chapters are sorted correctly.
+
+        Note: If there are missing chapters then the chapter numbering will be wrong.
+        Would be nice to find a better solution.
+    */
     parseChapters($, mangaId) {
         const chapters = [];
         const arrChapters = $('a.flex.items-center').toArray();
+        let sortingIndex = 0;
         for (const chapterObj of arrChapters) {
             const chapterId = $(chapterObj)
                 .attr('href')
@@ -1739,23 +1748,28 @@ class Parser {
             if (!chapterId)
                 continue;
             const time = new Date($('time.opacity-50', chapterObj).attr('datetime') ?? '');
-            let chapNum = parseFloat($('span.grow.flex.gap-2 span', chapterObj)
+            let chapName = $('span.grow.flex.gap-2 span', chapterObj)
                 .first()
                 .text()
-                .trim()
-                .replace(/[^0-9.]/g, ''));
+                .trim();
+            sortingIndex--;
             chapters.push(App.createChapter({
                 id: chapterId,
-                name: `Chapter ${chapNum}`,
-                chapNum,
+                name: chapName,
+                chapNum: 0,
                 time,
+                sortingIndex,
                 langCode: 'en',
             }));
         }
         if (chapters.length == 0) {
             throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}`);
         }
-        return chapters;
+        return chapters.map((chapter) => {
+            chapter.sortingIndex += chapters.length;
+            chapter.chapNum = chapter.sortingIndex;
+            return App.createChapter(chapter);
+        });
     }
     parseTags($) {
         const genres = [];
