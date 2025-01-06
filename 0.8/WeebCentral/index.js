@@ -1553,9 +1553,12 @@ class WeebCentral {
         this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const results = await this.parser.parseSearchResults($);
+        metadata = this.parser.isLastPage($)
+            ? undefined
+            : { offset: offset + LIMIT };
         return App.createPagedResults({
             results,
-            metadata: { offset: offset + LIMIT },
+            metadata,
         });
     }
     async getHomePageSections(sectionCallback) {
@@ -1774,7 +1777,7 @@ class Parser {
                 ?.split('/')[0] ?? '';
             if (id == '' || typeof id != 'string')
                 throw new Error('Id is empty');
-            const title = $('a.link.link-hover', item).text().trim() ?? '';
+            const title = $('a.link.link-hover', item).first().text().trim() ?? '';
             const image = $('img', item).attr('src') ??
                 $('img', item).attr('data-src') ??
                 '';
@@ -1899,6 +1902,9 @@ class Parser {
             const num = parseInt(numStr, 10);
             return String.fromCharCode(num);
         });
+    }
+    isLastPage($) {
+        return $('span:contains("View More Results...")').toArray().length == 0;
     }
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);
