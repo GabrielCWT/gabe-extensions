@@ -74,13 +74,28 @@ export class Parser {
         const chapters: Chapter[] = []
         const arrChapters = $('#chapters a').toArray()
         let backupChapNum = 0
+        let hasVolume = false
         for (const chapterObj of arrChapters) {
-            const id =
-                $(chapterObj).attr('href') ?? ''
+            const id = $(chapterObj).attr('href') ?? ''
 
-            const time = undefined
             const name = $(chapterObj).text().trim()
-            let chapNum = parseFloat($(chapterObj).text().trim().replace(/[^0-9.]/g, ''))
+            let chapNum = 0
+            let match = $(chapterObj)
+                .text()
+                .trim()
+                .match(/Chapter (\d+)/)
+            if (match && match[1]) {
+                chapNum = parseFloat(match[1])
+            }
+            let volume = 1
+            match = $(chapterObj)
+                .text()
+                .trim()
+                .match(/Group (\d+)/)
+            if (match && match[1]) {
+                hasVolume = true
+                volume = parseInt(match[1], 1)
+            }
             if (chapNum) backupChapNum = chapNum
             else chapNum = ++backupChapNum
             chapters.push(
@@ -88,8 +103,8 @@ export class Parser {
                     id,
                     name,
                     chapNum,
-                    time,
                     langCode: 'en',
+                    volume: hasVolume ? volume : 0,
                 })
             )
         }
@@ -129,9 +144,9 @@ export class Parser {
     async parseSearchResults($: cheerio.Root): Promise<any[]> {
         const results: PartialSourceManga[] = []
         for (const item of $('.my-3.grid > div').toArray()) {
-            const id =
-                ($('a', item).attr('href') ?? '')
-            if (id == '' || typeof id != 'string') throw new Error('Id is empty')
+            const id = $('a', item).attr('href') ?? ''
+            if (id == '' || typeof id != 'string')
+                throw new Error('Id is empty')
             const title = $('div a', item).text().trim() ?? ''
             const image =
                 $('a img', item).attr('src') ??
@@ -170,16 +185,18 @@ export class Parser {
         const trending: PartialSourceManga[] = []
         const recent: PartialSourceManga[] = []
 
-        for (const trendingObj of $('> div', $('.grid-cols-2').last()).toArray()) {
-            const id = $('a.text-secondary', trendingObj).attr('href') ?? ''
+        for (const trendingObj of $(
+            '> div',
+            $('.grid-cols-2').last()
+        ).toArray()) {
+            const id = $('a.relative', trendingObj).attr('href') ?? ''
             const title =
                 $('div a > div', trendingObj).first().text().trim() ?? ''
             const image =
                 $('a img', trendingObj).attr('src') ??
                 $('a img', trendingObj).attr('data-src') ??
                 ''
-            const subtitle =
-            $('.text-secondary', trendingObj).text().trim() ?? ''
+            const subtitle = $('.font-black', trendingObj).text().trim() ?? ''
             trending.push(
                 App.createPartialSourceManga({
                     image,
@@ -192,7 +209,10 @@ export class Parser {
         trendingSection.items = trending
         sectionCallback(trendingSection)
 
-        for (const recentObj of $('> div', $('.grid-cols-2').first()).toArray()) {
+        for (const recentObj of $(
+            '> div',
+            $('.grid-cols-2').first()
+        ).toArray()) {
             const id = $('a.text-secondary', recentObj).attr('href') ?? ''
             const title =
                 $('div a > div', recentObj).first().text().trim() ?? ''
@@ -200,8 +220,7 @@ export class Parser {
                 $('a img', recentObj).attr('src') ??
                 $('a img', recentObj).attr('data-src') ??
                 ''
-            const subtitle =
-                $('.text-secondary', recentObj).text().trim() ?? ''
+            const subtitle = $('.text-secondary', recentObj).text().trim() ?? ''
             recent.push(
                 App.createPartialSourceManga({
                     image,
