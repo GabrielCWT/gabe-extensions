@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const MangaPillParser_1 = require("./MangaPillParser");
 const BASE_DOMAIN = 'https://mangapill.com';
 exports.MangaPillInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'MangaPill',
     description: 'Extension that pulls manga from MangaPill MangaPill.',
     author: 'Gabe',
@@ -1682,11 +1682,27 @@ class Parser {
         const chapters = [];
         const arrChapters = $('#chapters a').toArray();
         let backupChapNum = 0;
+        let hasVolume = false;
         for (const chapterObj of arrChapters) {
             const id = $(chapterObj).attr('href') ?? '';
-            const time = undefined;
             const name = $(chapterObj).text().trim();
-            let chapNum = parseFloat($(chapterObj).text().trim().replace(/[^0-9.]/g, ''));
+            let chapNum = 0;
+            let match = $(chapterObj)
+                .text()
+                .trim()
+                .match(/Chapter (\d+)/);
+            if (match && match[1]) {
+                chapNum = parseFloat(match[1]);
+            }
+            let volume = 1;
+            match = $(chapterObj)
+                .text()
+                .trim()
+                .match(/Group (\d+)/);
+            if (match && match[1]) {
+                hasVolume = true;
+                volume = parseInt(match[1], 1);
+            }
             if (chapNum)
                 backupChapNum = chapNum;
             else
@@ -1695,8 +1711,8 @@ class Parser {
                 id,
                 name,
                 chapNum,
-                time,
                 langCode: 'en',
+                volume: hasVolume ? volume : 0,
             }));
         }
         return chapters;
@@ -1727,7 +1743,7 @@ class Parser {
     async parseSearchResults($) {
         const results = [];
         for (const item of $('.my-3.grid > div').toArray()) {
-            const id = ($('a', item).attr('href') ?? '');
+            const id = $('a', item).attr('href') ?? '';
             if (id == '' || typeof id != 'string')
                 throw new Error('Id is empty');
             const title = $('div a', item).text().trim() ?? '';
@@ -1760,12 +1776,12 @@ class Parser {
         const trending = [];
         const recent = [];
         for (const trendingObj of $('> div', $('.grid-cols-2').last()).toArray()) {
-            const id = $('a.text-secondary', trendingObj).attr('href') ?? '';
+            const id = $('a.relative', trendingObj).attr('href') ?? '';
             const title = $('div a > div', trendingObj).first().text().trim() ?? '';
             const image = $('a img', trendingObj).attr('src') ??
                 $('a img', trendingObj).attr('data-src') ??
                 '';
-            const subtitle = $('.text-secondary', trendingObj).text().trim() ?? '';
+            const subtitle = $('.font-black', trendingObj).text().trim() ?? '';
             trending.push(App.createPartialSourceManga({
                 image,
                 title: this.decodeHTMLEntity(title),
