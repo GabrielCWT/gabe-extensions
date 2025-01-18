@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1823,7 +1823,7 @@ class Parser {
         const recommendationSection = App.createHomeSection({
             id: 'recommendation',
             title: 'Recommended Mangas',
-            type: types_1.HomeSectionType.featured,
+            type: types_1.HomeSectionType.singleRowNormal,
             containsMoreItems: false,
         });
         const hotSection = App.createHomeSection({
@@ -1841,11 +1841,11 @@ class Parser {
         const recommendation = [];
         const hot = [];
         const recent = [];
-        for (const recommendationObj of $('glide__slide').toArray()) {
+        for (const recommendationObj of $('.glide__slide:not(.glide__slide--clone)').toArray()) {
             const id = $('a', recommendationObj).attr('href') ?? '';
             const title = $('.text-white', recommendationObj).text().trim() ?? '';
-            const image = $('img', recommendationObj).attr('src') ??
-                $('img', recommendationObj).attr('data-src') ??
+            const image = $('source', recommendationObj).first().attr('srcset') ??
+                $('img', recommendationObj).attr('src') ??
                 '';
             recommendation.push(App.createPartialSourceManga({
                 image,
@@ -1881,7 +1881,7 @@ class Parser {
                 ?.replace(/\/$/, '')
                 ?.split('/')
                 .slice(-2)[0] ?? '';
-            const title = $('span', recentObj).first().text().trim() ?? '';
+            const title = $('div.font-semibold', recentObj).text().trim() ?? '';
             const image = $('a img', recentObj).attr('src') ??
                 $('a img', recentObj).attr('data-src') ??
                 '';
