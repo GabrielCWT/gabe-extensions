@@ -214,7 +214,7 @@ export class Parser {
         const recommendationSection = App.createHomeSection({
             id: 'recommendation',
             title: 'Recommended Mangas',
-            type: HomeSectionType.featured,
+            type: HomeSectionType.singleRowNormal,
             containsMoreItems: false,
         })
         const hotSection = App.createHomeSection({
@@ -235,13 +235,15 @@ export class Parser {
         const hot: PartialSourceManga[] = []
         const recent: PartialSourceManga[] = []
 
-        for (const recommendationObj of $('glide__slide').toArray()) {
+        for (const recommendationObj of $(
+            '.glide__slide:not(.glide__slide--clone)'
+        ).toArray()) {
             const id = $('a', recommendationObj).attr('href') ?? ''
             const title =
                 $('.text-white', recommendationObj).text().trim() ?? ''
             const image =
+                $('source', recommendationObj).first().attr('srcset') ??
                 $('img', recommendationObj).attr('src') ??
-                $('img', recommendationObj).attr('data-src') ??
                 ''
             recommendation.push(
                 App.createPartialSourceManga({
@@ -254,6 +256,7 @@ export class Parser {
         }
         recommendationSection.items = recommendation
         sectionCallback(recommendationSection)
+
         for (const hotObj of $(
             'article.flex.gap-4',
             'section.bg-base-200.max-w-7xl'
@@ -291,7 +294,7 @@ export class Parser {
                     ?.replace(/\/$/, '')
                     ?.split('/')
                     .slice(-2)[0] ?? ''
-            const title = $('span', recentObj).first().text().trim() ?? ''
+            const title = $('div.font-semibold', recentObj).text().trim() ?? ''
             const image =
                 $('a img', recentObj).attr('src') ??
                 $('a img', recentObj).attr('data-src') ??
