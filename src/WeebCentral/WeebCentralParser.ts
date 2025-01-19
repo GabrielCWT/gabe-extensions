@@ -63,7 +63,7 @@ export class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [title],
+                titles: [this.decodeHTMLEntity(title)],
                 image,
                 rating: 0,
                 status,
