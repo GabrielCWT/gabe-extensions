@@ -235,28 +235,6 @@ export class Parser {
         const hot: PartialSourceManga[] = []
         const recent: PartialSourceManga[] = []
 
-        for (const recommendationObj of $(
-            '.glide__slide:not(.glide__slide--clone)'
-        ).toArray()) {
-            const id = $('a', recommendationObj).attr('href') ?? ''
-            const title =
-                $('.text-white', recommendationObj).text().trim() ?? ''
-            const image =
-                $('source', recommendationObj).first().attr('srcset') ??
-                $('img', recommendationObj).attr('src') ??
-                ''
-            recommendation.push(
-                App.createPartialSourceManga({
-                    image,
-                    title: this.decodeHTMLEntity(title),
-                    mangaId: id,
-                    subtitle: '',
-                })
-            )
-        }
-        recommendationSection.items = recommendation
-        sectionCallback(recommendationSection)
-
         for (const hotObj of $(
             'article.flex.gap-4',
             'section.bg-base-200.max-w-7xl'
@@ -311,6 +289,33 @@ export class Parser {
         }
         recentSection.items = recent
         sectionCallback(recentSection)
+
+        for (const recommendationObj of $(
+            '.glide__slide:not(.glide__slide--clone)'
+        ).toArray()) {
+            const id =
+                $('a', recommendationObj)
+                    .attr('href')
+                    ?.replace(/\/$/, '')
+                    ?.split('/')
+                    .slice(-2)[0] ?? ''
+            const title =
+                $('.text-white', recommendationObj).text().trim() ?? ''
+            const image =
+                $('source', recommendationObj).first().attr('srcset') ??
+                $('img', recommendationObj).attr('src') ??
+                ''
+            recommendation.push(
+                App.createPartialSourceManga({
+                    image,
+                    title: this.decodeHTMLEntity(title),
+                    mangaId: id,
+                    subtitle: '',
+                })
+            )
+        }
+        recommendationSection.items = recommendation
+        sectionCallback(recommendationSection)
     }
 
     parseViewMore($: cheerio.Root): PartialSourceManga[] {
