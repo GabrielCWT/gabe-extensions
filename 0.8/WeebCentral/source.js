@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.3',
+    version: '1.0.4',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1716,7 +1716,7 @@ class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [title],
+                titles: [this.decodeHTMLEntity(title)],
                 image,
                 rating: 0,
                 status,
