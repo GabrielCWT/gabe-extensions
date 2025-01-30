@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.4',
+    version: '1.0.5',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1577,6 +1577,14 @@ class WeebCentral {
         switch (homepageSectionId) {
             case 'recent':
                 param = `latest-updates/${page}`;
+                metadata = {
+                    ...metadata,
+                    page: page + 1,
+                };
+                break;
+            case 'hot':
+                param = `hot-updates`;
+                metadata = undefined;
                 break;
             default:
                 throw new Error('Section id not supported');
@@ -1587,10 +1595,10 @@ class WeebCentral {
         });
         const response = await this.requestManager.schedule(request, this.RETRY);
         const $ = this.cheerio.load(response.data);
-        const manga = this.parser.parseViewMore($);
+        const manga = this.parser.parseViewMore($, homepageSectionId);
         return App.createPagedResults({
             results: manga,
-            metadata: { ...metadata, page: page + 1 },
+            metadata,
         });
     }
     /**
@@ -1830,7 +1838,7 @@ class Parser {
             id: 'hot',
             title: 'Hot Updates',
             type: types_1.HomeSectionType.singleRowNormal,
-            containsMoreItems: false,
+            containsMoreItems: true,
         });
         const recentSection = App.createHomeSection({
             id: 'recent',
@@ -1900,10 +1908,11 @@ class Parser {
         recommendationSection.items = recommendation;
         sectionCallback(recommendationSection);
     }
-    parseViewMore($) {
+    parseViewMore($, homepageSectionId) {
         const manga = [];
         const collectedIds = [];
-        for (const obj of $('article').toArray()) {
+        const selector = homepageSectionId === 'hot' ? 'article.flex' : 'article';
+        for (const obj of $(selector).toArray()) {
             const image = $('source', obj).attr('srcset') ?? '';
             const title = $('img', obj).attr('alt') ?? '';
             const id = $('a', obj)
