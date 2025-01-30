@@ -23,7 +23,7 @@ import { Parser } from './WeebCentralParser'
 const BASE_DOMAIN = 'https://weebcentral.com'
 
 export const WeebCentralInfo: SourceInfo = {
-    version: '1.0.4',
+    version: '1.0.5',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -191,6 +191,14 @@ export class WeebCentral
         switch (homepageSectionId) {
             case 'recent':
                 param = `latest-updates/${page}`
+                metadata = {
+                    ...metadata,
+                    page: page + 1,
+                }
+                break
+            case 'hot':
+                param = `hot-updates`
+                metadata = undefined
                 break
             default:
                 throw new Error('Section id not supported')
@@ -201,10 +209,10 @@ export class WeebCentral
         })
         const response = await this.requestManager.schedule(request, this.RETRY)
         const $ = this.cheerio.load(response.data as string)
-        const manga = this.parser.parseViewMore($)
+        const manga = this.parser.parseViewMore($, homepageSectionId)
         return App.createPagedResults({
             results: manga,
-            metadata: { ...metadata, page: page + 1 },
+            metadata,
         })
     }
     /**

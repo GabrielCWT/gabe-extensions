@@ -221,7 +221,7 @@ export class Parser {
             id: 'hot',
             title: 'Hot Updates',
             type: HomeSectionType.singleRowNormal,
-            containsMoreItems: false,
+            containsMoreItems: true,
         })
 
         const recentSection = App.createHomeSection({
@@ -318,10 +318,15 @@ export class Parser {
         sectionCallback(recommendationSection)
     }
 
-    parseViewMore($: cheerio.Root): PartialSourceManga[] {
+    parseViewMore(
+        $: cheerio.Root,
+        homepageSectionId: string
+    ): PartialSourceManga[] {
         const manga: PartialSourceManga[] = []
         const collectedIds: string[] = []
-        for (const obj of $('article').toArray()) {
+        const selector =
+            homepageSectionId === 'hot' ? 'article.flex' : 'article'
+        for (const obj of $(selector).toArray()) {
             const image: string = $('source', obj).attr('srcset') ?? ''
             const title: string = $('img', obj).attr('alt') ?? ''
             const id =
