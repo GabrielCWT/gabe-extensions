@@ -336,14 +336,7 @@ export class Parser {
                     ?.replace(/\/$/, '')
                     ?.split('/')
                     .slice(-2)[0] ?? ''
-            const getChapter = $('div.opacity-70', obj).first().text().trim()
-
-            const chapNumRegex = getChapter.match(/(\d+\.?\d?)+/)
-            let chapNum = 0
-            if (chapNumRegex && chapNumRegex[1])
-                chapNum = Number(chapNumRegex[1])
-
-            const subtitle = chapNum ? 'Chapter ' + chapNum : 'Chapter N/A'
+            const subtitle = $('div.opacity-70', obj).first().text().trim()
 
             if (!id || !title || collectedIds.includes(id)) continue
             manga.push(
