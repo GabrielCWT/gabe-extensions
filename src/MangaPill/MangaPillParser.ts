@@ -94,7 +94,7 @@ export class Parser {
                 .match(/Group (\d+)/)
             if (match && match[1]) {
                 hasVolume = true
-                volume = parseInt(match[1], 1)
+                volume = parseInt(match[1])
             }
             if (chapNum) backupChapNum = chapNum
             else chapNum = ++backupChapNum

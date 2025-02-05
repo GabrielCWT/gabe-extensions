@@ -26,7 +26,7 @@ import { Parser } from './MangaPillParser'
 const BASE_DOMAIN = 'https://mangapill.com'
 
 export const MangaPillInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'MangaPill',
     description: 'Extension that pulls manga from MangaPill MangaPill.',
     author: 'Gabe',
