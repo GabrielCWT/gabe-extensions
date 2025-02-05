@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const MangaPillParser_1 = require("./MangaPillParser");
 const BASE_DOMAIN = 'https://mangapill.com';
 exports.MangaPillInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'MangaPill',
     description: 'Extension that pulls manga from MangaPill MangaPill.',
     author: 'Gabe',
@@ -1701,7 +1701,7 @@ class Parser {
                 .match(/Group (\d+)/);
             if (match && match[1]) {
                 hasVolume = true;
-                volume = parseInt(match[1], 1);
+                volume = parseInt(match[1]);
             }
             if (chapNum)
                 backupChapNum = chapNum;
