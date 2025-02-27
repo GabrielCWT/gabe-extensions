@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.6',
+    version: '1.0.7',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1534,17 +1534,15 @@ class WeebCentral {
         const LIMIT = 32;
         const offset = metadata?.offset ?? 0;
         let searchParams = '';
-        // Regular search
+        // Title search
         if (query.title) {
             searchParams = searchParams.concat(encodeURI(`&text=${query.title ?? ''}`));
         }
         // Tag search
-        else {
-            for (const tag of query.includedTags) {
-                searchParams = searchParams.concat(`&included_tag=${tag.id}`);
-            }
-            searchParams.concat(`limit=${LIMIT}&offset=${offset}`);
+        for (const tag of query.includedTags) {
+            searchParams = searchParams.concat(`&included_tag=${tag.id}`);
         }
+        searchParams = searchParams.concat(`&limit=${LIMIT}&offset=${offset}`);
         const request = App.createRequest({
             url: `${this.baseUrl}/search/data?sort=Best%20Match&order=Ascending&display_mode=Full%20Display${searchParams}`,
             method: 'GET',
