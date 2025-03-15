@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.7',
+    version: '1.0.8',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1840,7 +1840,7 @@ class Parser {
         });
         const recentSection = App.createHomeSection({
             id: 'recent',
-            title: 'Recently Updated',
+            title: 'Latest Updates',
             type: types_1.HomeSectionType.singleRowNormal,
             containsMoreItems: true,
         });
@@ -1866,7 +1866,7 @@ class Parser {
         }
         hotSection.items = hot;
         sectionCallback(hotSection);
-        for (const recentObj of $('article', 'section.cols-span-1.rounded').toArray()) {
+        for (const recentObj of $('article', 'section.bg-base-200.rounded-sm').toArray()) {
             const id = $('a.aspect-square', recentObj)
                 .attr('href')
                 ?.replace(/\/$/, '')
