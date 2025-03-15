@@ -208,7 +208,7 @@ export class Parser {
     }
 
     parseHomeSections(
-        $: any,
+        $: cheerio.Root,
         sectionCallback: (section: HomeSection) => void
     ): void {
         const recommendationSection = App.createHomeSection({
@@ -226,7 +226,7 @@ export class Parser {
 
         const recentSection = App.createHomeSection({
             id: 'recent',
-            title: 'Recently Updated',
+            title: 'Latest Updates',
             type: HomeSectionType.singleRowNormal,
             containsMoreItems: true,
         })
@@ -264,7 +264,7 @@ export class Parser {
 
         for (const recentObj of $(
             'article',
-            'section.cols-span-1.rounded'
+            'section.bg-base-200.rounded-sm'
         ).toArray()) {
             const id =
                 $('a.aspect-square', recentObj)
