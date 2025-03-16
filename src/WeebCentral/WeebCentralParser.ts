@@ -168,7 +168,7 @@ export class Parser {
         const genres: Tag[] = []
         for (const genreObj of $(
             'span',
-            $('fieldset.collapse-content').last()
+            $('div.collapse-content').last()
         ).toArray()) {
             const label = $(genreObj).text().trim()
             const id = label
