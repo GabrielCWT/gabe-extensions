@@ -52,7 +52,7 @@ export class WeebCentral
 {
     baseUrl = BASE_DOMAIN
     requestManager = App.createRequestManager({
-        requestsPerSecond: 5,
+        requestsPerSecond: 3,
         requestTimeout: 20000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
