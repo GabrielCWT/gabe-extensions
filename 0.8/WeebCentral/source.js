@@ -1463,7 +1463,7 @@ class WeebCentral {
         this.cheerio = cheerio;
         this.baseUrl = BASE_DOMAIN;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 5,
+            requestsPerSecond: 3,
             requestTimeout: 20000,
             interceptor: {
                 interceptRequest: async (request) => {
