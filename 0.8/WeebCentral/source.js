@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const WeebCentralParser_1 = require("./WeebCentralParser");
 const BASE_DOMAIN = 'https://weebcentral.com';
 exports.WeebCentralInfo = {
-    version: '1.0.9',
+    version: '1.1.1',
     name: 'WeebCentral',
     description: 'Extension that pulls manga from WeebCentral.',
     author: 'Gabe',
@@ -1463,7 +1463,7 @@ class WeebCentral {
         this.cheerio = cheerio;
         this.baseUrl = BASE_DOMAIN;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 3,
+            requestsPerSecond: 1,
             requestTimeout: 20000,
             interceptor: {
                 interceptRequest: async (request) => {
